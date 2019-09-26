@@ -4,13 +4,12 @@
     ld $a, r0           # r0 = address of a
     ld $i, r1           # r1 = address of i
     ld $3, r2           # r1 = 3
-    ld (r0,r2,4), r3    # r3 = address of a[3]
-    ld 0(r3), r3        # r3 = a[3]
+    ld (r0,r2,4), r3    # r3 = a[3]
     st r3, 0(r1)        # i = r1 = a[3]
 
     # i = a[i]
     ld 0(r1), r2        # r2 = i
-    ld (r0, r2, 4), r3   # r3 = a[i]
+    ld (r0, r2, 4), r3  # r3 = a[i]
     st r3, 0(r1)        # i = a[i]
 
     # p = &j
