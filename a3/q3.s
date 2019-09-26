@@ -39,11 +39,13 @@ ld 0(r3), r5            #r5 = b[0] = 0
 ld 0(r2), r6            #r6 = value of p
 st r5, 12(r6)           #p[3] = r5
 
+halt
+
 .pos 0x200
 a:  .long 0             # a
 p:  .long 0             # *p
 b:  .long 0             # b[0]
-    .long 1            # b[1]
+    .long 1             # b[1]
     .long 2             # b[2]
     .long 3             # b[3]
     .long 4             # b[4]
