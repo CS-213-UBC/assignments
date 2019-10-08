@@ -59,6 +59,7 @@ void list_delete_element (struct list* l, struct element* e) {
     element_set_prev (element_get_next (e), element_get_prev (e));
   element_set_prev (e, NULL);
   element_set_next (e, NULL);
+
   //free (element_get_value (e));
   //free (e);
 }

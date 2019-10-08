@@ -1,0 +1,1 @@
+dangling pointer in list_delete_element() function in list.c
