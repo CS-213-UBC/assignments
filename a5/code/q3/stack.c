@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "integer.h"
 #include "stack.h"
+#include "../refcount.h"
 
 struct element {
   struct integer* integer;
@@ -11,8 +12,9 @@ struct element {
 struct element* head;
 
 void stack_push(struct integer* integer) {
-  struct element* element = malloc(sizeof(*element));
+  struct element* element = rc_malloc(sizeof(*element));
   element->integer = integer;
+  rc_keep_ref(integer);
   element->next  = head;
   head = element;
 }
@@ -22,7 +24,8 @@ void stack_pop_and_print() {
     struct element* element = head;
     head = head->next;
     printf("%d ", integer_value(element->integer));
-    free(element);
+	rc_free_ref(element->integer);
+	rc_free_ref(element);
   }
 }
 
