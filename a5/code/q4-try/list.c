@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include "element.h"
 #include "list.h"
-#include "../refcount.h"
+#include "refcount.h"
+
 
 struct list {
   struct element* head;
@@ -62,13 +63,10 @@ void list_delete_element (struct list* l, struct element* e) {
   element_set_prev (e, NULL);
   element_set_next (e, NULL);
 
+  rc_free_ref(element_get_value(e));
+  rc_free_ref(e);
   //free (element_get_value (e));
   //free (e);
-
-  //element_free_ref(e);
-
-  rc_free_ref (element_get_value (e));
-  rc_free_ref (e);
 }
 
 /**
