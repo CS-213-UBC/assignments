@@ -1,0 +1,1 @@
+bug in the pop method, where the pointer is being freed. however it is called again in the return statement. this memory is later accessed which causes unexpected behaviour.
