@@ -81,6 +81,7 @@ struct node* tree_insert_node (struct tree* t, struct element* e) {
 
 static void tree_ordered_suffix_print_helper (struct node* n) {
   if (n != NULL) {
+
     tree_ordered_suffix_print_helper (n->left);
     for (struct element* e = n->e; e != NULL; e = element_get_next (e))
       printf ("%s ", element_get_value (e));

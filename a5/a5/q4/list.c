@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "element.h"
 #include "list.h"
-#include "../refcount.h"
+#include "refcount.h"
 
 struct list {
   struct element* head;
@@ -27,8 +27,7 @@ void list_delete (struct list* l) {
     n = element_get_next (e);
     list_delete_element (l, e);
   }
-  //free (l);
-  rc_free_ref(l);
+  rc_free_ref (l);
 }
 
 /**
@@ -37,8 +36,9 @@ void list_delete (struct list* l) {
  */
 struct element* list_add_element (struct list* l, char* value) {
   struct element* e = element_create (value);
-  if (l->head == NULL)
-    l->head = e;
+  if (l->head == NULL) {
+	  l->head = e;
+  }
   else {
     element_set_next (l->tail, e);
     element_set_prev (e, l->tail);
@@ -51,24 +51,21 @@ struct element* list_add_element (struct list* l, char* value) {
  * Remove element from list and free it
  */
 void list_delete_element (struct list* l, struct element* e) {
-  if (e == l->head)
-    l->head = element_get_next (e);
-  else
-    element_set_next (element_get_prev (e), element_get_next (e));
+	if (e == l->head)
+		l->head = element_get_next(e);
+	else {
+		element_set_next(element_get_prev(e), element_get_next(e));
+		//element_free_ref(e);
+	}
   if (e == l->tail)
     l->tail = element_get_prev (e);
-  else
-    element_set_prev (element_get_next (e), element_get_prev (e));
+  else {
+	  element_set_prev(element_get_next(e), element_get_prev(e));
+	  //element_free_ref(e);
+  }
   element_set_prev (e, NULL);
-  element_set_next (e, NULL);
-
-  //free (element_get_value (e));
-  //free (e);
-
+  element_set_next(e, NULL); 
   element_free_ref(e);
-
-  //rc_free_ref (element_get_value (e));
-  //rc_free_ref (e);
 }
 
 /**

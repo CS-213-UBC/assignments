@@ -4,7 +4,7 @@
 #include "element.h"
 #include "list.h"
 #include "tree.h"
-#include "../refcount.h"
+#include "refcount.h"
 
 struct tree {
   struct node* root;
@@ -30,19 +30,9 @@ static void tree_delete_helper (struct node* n) {
   if (n != NULL) {
     tree_delete_helper (n->left);
     tree_delete_helper (n->right);
-    //free (n->e);
-    //free (n);
-
-    //rc_free_ref (element_get_value(n->e)); 
-    element_free_ref(n->e);
-
-
-    //rc_free_ref (n->e);
-    rc_free_ref (n);
-
+	element_free_ref(n->e);
+	rc_free_ref(n);
   }
-
-  
 }
 
 /**
@@ -50,29 +40,23 @@ static void tree_delete_helper (struct node* n) {
  */
 void tree_delete (struct tree* t) {
   tree_delete_helper (t->root);
-  //free (t);
-
-  rc_free_ref (t); 
+  rc_free_ref (t);
 }
 
-static struct node* tree_insert_node_helper (struct node** np, struct element* e) {
-  if (*np != NULL) {
-    if (strcmp (element_get_value (e), element_get_value ((*np)->e)) <= 0)
-      return tree_insert_node_helper (&(*np)->left, e);
-    else
-      return tree_insert_node_helper (&(*np)->right, e);
-  } else {
-    *np = rc_malloc (sizeof (**np));
-    (*np)->e    = e;
-
-    element_keep_ref(e);
-
-    //rc_keep_ref(e);
-    //rc_keep_ref(element_get_value(e));
-
-    (*np)->left = (*np)->right = NULL;
-    return *np;
-  }
+static struct node* tree_insert_node_helper(struct node** np, struct element* e) {
+	if (*np != NULL) {
+		if (strcmp(element_get_value(e), element_get_value((*np)->e)) <= 0)
+			return tree_insert_node_helper(&(*np)->left, e);
+		else
+			return tree_insert_node_helper(&(*np)->right, e);
+	}
+	else {
+		*np = rc_malloc(sizeof(**np));
+		(*np)->e = e;
+		element_keep_ref(e);
+		(*np)->left = (*np)->right = NULL;
+		return *np;
+	}
 }
 
 /**
