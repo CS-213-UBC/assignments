@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "integer.h"
 #include "set.h"
-#include "../refcount.h"
+#include "refcount.h"
 
 #define SIZE 997
 
