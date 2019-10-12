@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "element.h"
-#include "../refcount.h"
+#include "refcount.h"
 
 struct element {
   char*           value;  // Possibly referenced counted; you decide
@@ -47,7 +47,13 @@ struct element* element_get_prev (struct element* e) {
  * Set prev element of list.
  */
 void element_set_prev(struct element* e, struct element* prev) {
+	/*
+	if (e->prev != NULL) {
+		element_free_ref(e->prev);
+	}
+	*/
   e->prev = prev;
+  //element_keep_ref(prev);
 }
 
 /**
@@ -61,7 +67,13 @@ struct element* element_get_next (struct element* e) {
  * Set next element of list.
  */
 void element_set_next (struct element* e, struct element* next) {
+	/*
+	if (e->next != NULL) {
+		element_free_ref(e->next);
+	}
+	*/
   e->next = next;
+  //element_keep_ref(next);
 }
 
 /**
@@ -69,8 +81,8 @@ void element_set_next (struct element* e, struct element* next) {
  */
 void element_keep_ref (struct element* e) {
   // TODO possibly reference count e->value as well
-  rc_keep_ref (e);
-  rc_keep_ref(element_get_value(e));
+	rc_keep_ref(e->value);
+	rc_keep_ref (e);
 }
 
 /**
@@ -78,6 +90,6 @@ void element_keep_ref (struct element* e) {
  */
 void element_free_ref (struct element* e) {
   // TODO possibly reference count e->value as well
-  rc_free_ref (e);
-  rc_free_ref(element_get_value(e));
+	rc_free_ref(e->value);
+	rc_free_ref (e);
 }

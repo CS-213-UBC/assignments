@@ -69,8 +69,9 @@ void element_set_next (struct element* e, struct element* next) {
  */
 void element_keep_ref (struct element* e) {
   // TODO possibly reference count e->value as well
-  rc_keep_ref (e);
+  
   rc_keep_ref (element_get_value(e));
+  rc_keep_ref (e);
 }
 
 /**
@@ -78,6 +79,7 @@ void element_keep_ref (struct element* e) {
  */
 void element_free_ref (struct element* e) {
   // TODO possibly reference count e->value as well
-  rc_free_ref (e);
+  
   rc_free_ref (element_get_value(e));
+  rc_free_ref (e);
 }
