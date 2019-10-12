@@ -40,23 +40,22 @@ static void tree_delete_helper (struct node* n) {
  */
 void tree_delete (struct tree* t) {
   tree_delete_helper (t->root);
-  rc_free_ref (t);
+  rc_free_ref(t);
 }
 
-static struct node* tree_insert_node_helper(struct node** np, struct element* e) {
-	if (*np != NULL) {
-		if (strcmp(element_get_value(e), element_get_value((*np)->e)) <= 0)
-			return tree_insert_node_helper(&(*np)->left, e);
-		else
-			return tree_insert_node_helper(&(*np)->right, e);
-	}
-	else {
-		*np = rc_malloc(sizeof(**np));
-		(*np)->e = e;
-		element_keep_ref(e);
-		(*np)->left = (*np)->right = NULL;
-		return *np;
-	}
+static struct node* tree_insert_node_helper (struct node** np, struct element* e) {
+  if (*np != NULL) {
+    if (strcmp (element_get_value (e), element_get_value ((*np)->e)) <= 0)
+      return tree_insert_node_helper (&(*np)->left, e);
+    else
+      return tree_insert_node_helper (&(*np)->right, e);
+  } else {
+    *np = rc_malloc (sizeof (**np));
+    (*np)->e    = e;
+	element_keep_ref(e);
+    (*np)->left = (*np)->right = NULL;
+    return *np;
+  }
 }
 
 /**

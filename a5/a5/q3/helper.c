@@ -3,7 +3,7 @@
 #include "stack.h"
 #include "integer.h"
 #include "helper.h"
-#include "refcount.h"
+#include "../refcount.h"
 
 void helper_process_input(int argc, char** argv) {
   for (int i=1; i<argc; i++) {

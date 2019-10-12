@@ -13,9 +13,9 @@ struct element {
  * Create an element
  */
 struct element* element_create (char* value) {
-  struct element* e = rc_malloc (sizeof (struct element));
+  struct element* e = rc_malloc(sizeof (struct element));
   int value_length = strlen (value);
-  e->value = rc_malloc (value_length + 1);
+  e->value = rc_malloc(value_length + 1);
   strncpy (e->value, value, value_length);
   e->prev = NULL;
   e->next = NULL;
@@ -47,13 +47,7 @@ struct element* element_get_prev (struct element* e) {
  * Set prev element of list.
  */
 void element_set_prev(struct element* e, struct element* prev) {
-	/*
-	if (e->prev != NULL) {
-		element_free_ref(e->prev);
-	}
-	*/
   e->prev = prev;
-  //element_keep_ref(prev);
 }
 
 /**
@@ -67,13 +61,7 @@ struct element* element_get_next (struct element* e) {
  * Set next element of list.
  */
 void element_set_next (struct element* e, struct element* next) {
-	/*
-	if (e->next != NULL) {
-		element_free_ref(e->next);
-	}
-	*/
   e->next = next;
-  //element_keep_ref(next);
 }
 
 /**
@@ -82,7 +70,7 @@ void element_set_next (struct element* e, struct element* next) {
 void element_keep_ref (struct element* e) {
   // TODO possibly reference count e->value as well
 	rc_keep_ref(e->value);
-	rc_keep_ref (e);
+	rc_keep_ref(e);
 }
 
 /**
@@ -91,5 +79,5 @@ void element_keep_ref (struct element* e) {
 void element_free_ref (struct element* e) {
   // TODO possibly reference count e->value as well
 	rc_free_ref(e->value);
-	rc_free_ref (e);
+	rc_free_ref(e);
 }

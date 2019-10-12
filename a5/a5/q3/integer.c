@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "integer.h"
-#include "refcount.h"
+#include "../refcount.h"
 
 struct integer {
   int value;

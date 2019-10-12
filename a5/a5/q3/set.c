@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "integer.h"
 #include "set.h"
-#include "refcount.h"
+#include "../refcount.h"
 
 #define SIZE 997
 
@@ -13,8 +13,11 @@ int hash(int key) {
 }
 
 void set_add(struct integer* integer) {
-  set[hash(integer_value(integer))] = integer;
-  rc_keep_ref(integer);
+	if (set[hash(integer_value(integer))] != NULL) {
+		rc_free_ref(set[hash(integer_value(integer))]);
+	}
+	set[hash(integer_value(integer))] = integer;
+	rc_keep_ref(integer);
 }
 
 void set_print() {
@@ -27,7 +30,7 @@ void set_print() {
 
 void set_empty() {
 	for (int i = 0; i < SIZE; i++) {
-		if (set[i] != 0) {
+		if (set[i] != NULL) {
 			rc_free_ref(set[i]);
 		}
 		set[i] = NULL;

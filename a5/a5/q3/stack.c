@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "integer.h"
 #include "stack.h"
-#include "refcount.h"
+#include "../refcount.h"
 
 struct element {
   struct integer* integer;

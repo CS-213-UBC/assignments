@@ -1,2 +1,19 @@
-8
-5
+The program had multiple issues:
+	1- Integer was making a memory allocation and not freeing
+	2- Integer was pointed to by in the stack and in the set, and not making a refcount for that
+	3- Set was not freeing the memory allocation after freeing
+	4- If we have duplicates in the input, set only saves 1 copy while stack saves 2 so need to
+		 make consideration for the refcount in that case
+
+Solution:
+	We understand our solution could have smaller code, but we made it more robust:
+	Integer is first allocated, and then pointed to by Set and stack so we did:
+	1- increment refcount for integer when adding to the set
+	2- increment refcount for integer when adding to the stack
+	3- decrement refcount for the integer in helper_process_input as we will not be using the integer*
+	4- decrement refcount when poping from stack
+	5- decrement refcount when deleting Set (which will free(integer))
+
+To handle leaks with duplication, we first check if the set[with the integer value integer] was empty, if not
+decrement refcount for that item, and then assign the new duplicated item
+
