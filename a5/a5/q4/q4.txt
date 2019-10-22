@@ -1,3 +1,7 @@
-dangling pointer in list_delete_element() function in list.c
-this function frees the value of the element as well as the element itself when list_delete is called
-tree nodes are pointers to this list, they become dangling pointers once the list is deleted.
+There was 2 issues:
+	1- when we were freeing element, we didn't free the element=>value as we have allocated for it
+	2- When inserting to the tree, we didn't increment counter for both element and element->value
+Solution:
+	1- Edit element_free_ref & element_keep_ref to always free or keep for element-> value as we have allocated for it
+	2- Use element_free_ref & element_keep_ref whenever we were doing a free or a keep for an element
+	3- Use element_keep_ref when inserting element to the Tree
