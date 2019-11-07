@@ -122,11 +122,11 @@ int list_len (struct list* list) {
 void list_map1 (void (*f) (element_t*, element_t), struct list* out_list, struct list* in_list) {
     
     for (int i = 0; i < in_list->len; i++) {
-      element_t *out = malloc(sizeof(element_t));
-        
-      f (out, in_list->data[i]);
-      list_append (out_list, *out);
-      free(out);
+      element_t out = NULL;
+      
+      f (&out, in_list->data[i]);
+      list_append (out_list, out);
+      
     }
     
 }
@@ -151,12 +151,16 @@ void list_map2 (void (*f) (element_t*, element_t, element_t), struct list* out_l
     size = list_len(in_list0);
   }
 
+  //element_t *out = malloc(sizeof(element_t));
+
   for (int i = 0; i < size; i++){
-    element_t *out = malloc(sizeof(element_t));
-    f (out, in_list0->data[i],in_list1->data[i]);
-    list_append(out_list, *out);
-    free(out);
+    element_t out = NULL;
+    
+    f (&out, in_list0->data[i],in_list1->data[i]);
+    list_append(out_list, out);
+    
   }
+  //free(out);
 }
 
 /**
