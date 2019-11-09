@@ -57,7 +57,6 @@ void concatString(element_t* rv, element_t av, element_t bv) {
     char **r = (char**) rv; 
     char *b = bv;
     char *a = av;
-    printf("len is %d", strlen(b)*sizeof(char*));
     *r = realloc(*r, (strlen(b) + 2)*sizeof(char*));
     // if output has length greater than 0, add a space, and then string concatenate output and b
     if (strlen(*r) > 0){
