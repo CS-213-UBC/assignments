@@ -1,0 +1,7 @@
+real    0m0.013s for 1 read
+real    0m0.111s for 10 reads
+real    0m1.072s for 100 reads
+real    0m10.710s for 1000 reads
+
+from this, the time grows linearly with the number of reads. It is a positive linear relationship. 
+The CPU must wait for the result to be returned for every num block specified by the user.
