@@ -12,12 +12,22 @@ queue_t      pending_read_queue;
 unsigned int sum = 0;
 
 void interrupt_service_routine () {
-  // TODO
+  void* val;
+  queue_dequeue (pending_read_queue, &val, NULL, NULL);
+  uthread_unblock(val);
 }
 
 void* read_block (void* blocknov) {
-  // TODO schedule read and the update (correctly)
+  int* num_blockv = blocknov;
+  int result;
+  disk_schedule_read(&result, *num_blockv);
 
+  uthread_t t = uthread_self();
+  queue_enqueue (pending_read_queue, &t, NULL, NULL);
+
+  uthread_block();
+
+  sum += result;
   return NULL;
 }
 
@@ -41,5 +51,20 @@ int main (int argc, char** argv) {
 
   // Sum Blocks
   // TODO
+  for (int blockno = 0; blockno < num_blocks; blockno++) {
+
+    uthread_t thread1 = uthread_create(read_block, 0);
+    
+    if (blockno == num_blocks - 1){
+      uthread_join(thread1, 0);
+
+    }
+  }
+
+
+
+
+
+    
 }
 
