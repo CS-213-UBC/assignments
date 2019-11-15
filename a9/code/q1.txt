@@ -4,4 +4,5 @@ real    0m1.072s for 100 reads
 real    0m10.710s for 1000 reads
 
 from this, the time grows linearly with the number of reads. It is a positive linear relationship. 
-The CPU must wait for the result to be returned for every num block specified by the user.
+The CPU must wait for the result of the disk read to be returned for every num block specified by the user, 
+before requesting another disk read (PIO) for a different block.

@@ -11,6 +11,7 @@
 queue_t      pending_read_queue; //queue for reading
 unsigned int sum = 0;
 
+//after disk read is finished, interrupts CPU, does callback which is the 'handle read / exit' function. 
 void interrupt_service_routine () {
   void* val;
   void (*callback)(void*,void*);
@@ -52,14 +53,13 @@ int main (int argc, char** argv) {
   // TODO
   for (int blockno = 0; blockno < num_blocks; blockno++) {
     int result;
-    void* val;
     void* callback;
-    if (blockno = num_blocks - 1){ //last one
+    if (blockno == num_blocks - 1){ //last one
       callback = handle_read_and_exit;
     } else { //enqueue
       callback = handle_read;
     }
-    queue_enqueue (pending_read_queue, &val, NULL, callback);
+    queue_enqueue (pending_read_queue, &result, NULL, callback);
     disk_schedule_read (&result, blockno);   // request disk to read specified blockno
   }
 

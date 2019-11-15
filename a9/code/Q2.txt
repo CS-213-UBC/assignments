@@ -1,0 +1,16 @@
+real    0m0.014s - for 1 read
+real    0m0.015s - for 10 reads
+real    0m0.017s - for 100 reads 
+real    0m0.033s - for 1000 reads 
+
+The execution time for the same implementation using threads (Q2) is significantly 
+faster than the implementation using asynchronous programming.
+
+This is because in the first implementation, the main thread has to wait for the disk read to 
+return a result before requesting another diskread (PIO).
+For the second implementation, the disk read requests (PIO) for all the num blocks are sent all at once
+while the disk read is happening (in parallel). Disk can process multiple requests in parallel.
+therefore it is significantly faster. 
+
+
+
