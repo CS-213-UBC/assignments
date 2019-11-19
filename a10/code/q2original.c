@@ -7,7 +7,6 @@ const int N = 100000;
 int cnt = 0;
 
 uthread_t t0, t1, t2;
-uthread_mutex_t mx;   
 
 void countUp() {
   for (int i=0; i<N; i++)
@@ -20,16 +19,13 @@ void countDown() {
 }
 
 void* count(void* v) {
-  uthread_mutex_lock(mx);
   countUp();
   countDown();
-  uthread_mutex_unlock(mx);
   return NULL;
 }
 
 int main(int arg, char** arv) {
   uthread_init(4);
-  mx = uthread_mutex_create();
   t0 = uthread_create(count, NULL);
   t1 = uthread_create(count, NULL);
   t2 = uthread_create(count, NULL);
