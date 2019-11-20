@@ -7,6 +7,7 @@
 uthread_t threads[NUM_THREADS];
 uthread_mutex_t mx; 
 uthread_cond_t printing_a; 
+int count = 0;
 
 void randomStall() {
   int i, r = random() >> 16;
@@ -14,28 +15,24 @@ void randomStall() {
 }
 
 void waitForAllOtherThreads() {
-  
-  //uthread_mutex_lock(mx);
   uthread_cond_wait(printing_a);
-  //uthread_mutex_unlock(mx);
+  
+  
   
 }
 
 void* p(void* v) {
-  
-  printf("a\n");
   uthread_mutex_lock(mx);
-  waitForAllOtherThreads();
-  uthread_mutex_unlock(mx);
-
+  printf("a\n");
+  count += 1;
+  if (count == NUM_THREADS){
+    
+    uthread_cond_broadcast(printing_a);
+  } else {
+    waitForAllOtherThreads();
+  }
   printf("b\n");
-  //uthread_mutex_lock(mx);
-  uthread_cond_broadcast(printing_a);
-  uthread_cond_signal(printing_a);
-
-  
-  //uthread_cond_signal(printing_a);
-  //uthread_mutex_unlock(mx);
+  uthread_mutex_unlock(mx);
   return NULL;
 }
 
