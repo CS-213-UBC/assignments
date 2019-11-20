@@ -15,22 +15,23 @@ void randomStall() {
 }
 
 void waitForAllOtherThreads() {
-  uthread_cond_wait(printing_a);
-  
-  
-  
+    while(count != NUM_THREADS){
+      uthread_cond_wait(printing_a);
+  }
 }
 
 void* p(void* v) {
+  randomStall();
   uthread_mutex_lock(mx);
+  
   printf("a\n");
   count += 1;
+  waitForAllOtherThreads();
+
   if (count == NUM_THREADS){
-    
-    uthread_cond_broadcast(printing_a);
-  } else {
-    waitForAllOtherThreads();
+    uthread_cond_signal(printing_a);
   }
+
   printf("b\n");
   uthread_mutex_unlock(mx);
   return NULL;
