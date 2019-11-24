@@ -9,6 +9,7 @@ struct StringNode_class StringNode_class_table = {
   StringNode_printNode,
   Node_insert,
   Node_print,
+  StringNode_delete,
 };
 
 void StringNode_ctor(void* thisv, char* s) {
@@ -26,6 +27,18 @@ int StringNode_compareTo(void* thisv, void* nodev) {
 void StringNode_printNode(void* thisv) {
   struct StringNode* this = thisv;
   printf("%s\n", this->s);
+}
+
+void StringNode_delete(void* thisv){
+  struct StringNode* this = thisv;
+  if(this->left != NULL){
+    this->left->class->delete(this->left);
+  }
+  if(this->right != NULL){
+    this->right->class->delete(this->right);
+  }
+
+  free(this);
 }
 
 void* new_StringNode(char* s) {

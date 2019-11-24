@@ -20,7 +20,14 @@ void         list_map2         (void (*f) (element_t*, element_t, element_t), st
 void         list_foldl        (void (*f) (element_t*, element_t, element_t), element_t* out_value_p, struct list* in_list);
 void         list_filter       (int  (*f) (element_t),                        struct list* out_list,  struct list* in_list);
 void         list_foreach      (void (*f) (element_t),                        struct list* list);
-void		add (element_t* rv, element_t av, element_t bv);
+// void		add (element_t* rv, element_t av, element_t bv);
 void list_scan ( void (*f) (element_t*, element_t, element_t), element_t base, struct list* out, struct list* in);
+void max (element_t* rv, element_t av, element_t bv);
+void even (element_t* rv, element_t av);
+
+int add (int a, int b);
+int sub (int a ,int b);
+int diva (int a, int b);
+int mul (int a, int b);
 
 #endif /* __list_h__ */

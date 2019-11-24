@@ -9,6 +9,7 @@ struct Node_class {
   void (*printNode) (void*);
   void (*insert)    (void*, void*);
   void (*print)     (void*);
+  void (*delete)	(void*);
 };
 extern struct Node_class Node_class_table;
 

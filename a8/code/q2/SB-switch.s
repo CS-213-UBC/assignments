@@ -25,6 +25,9 @@ default:  ld   $0xe, r1         # r1 = 14
 done:     ld   $j, r0           # r0 = &j
           st   r1, 0x0(r0)      # j = r1
           j   cont              # goto cont
+
+
+               
 .pos 0x800
 jmptable: .long case20          # code address for case 20
           .long case21          # code address for case 21

@@ -1,0 +1,6 @@
+real    0m0.022s - for 1 read
+real    0m0.023s - for 10 reads
+real    0m0.033s - for 100 reads 
+real    0m0.246s - for 1000 reads 
+
+The execution time for the same implementation using threads in a semi synchronous method is significantly faster than in the polling method, but it starts to slow down compared to the asynchronous method once we have lots of read requests, but still way faster than sRead method of block reading.

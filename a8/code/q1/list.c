@@ -195,11 +195,45 @@ void list_filter (int (*f) (element_t), struct list* out_list, struct list* in_l
     }
   }
 }
+void list_scan (
+    void (*f) (element_t*, element_t, element_t), 
+    element_t base, struct list* out, struct list* in
+) {
+  element_t rv = 0;
+  f (&rv, base, in->data[0]);
+  list_append (out, rv);
+  for (int i = 1; i < in->len; i++) {
+     rv = 0;
+     f (&rv, out->data[i-1], in->data[i]);
+     list_append (out, rv);
+  }
+}
 
+void add (element_t* rv, element_t av, element_t bv) {
+  int **r = (int**) rv, *a = av, *b = bv;
+  if (*r == NULL)
+    *r = malloc (sizeof (int*));
+  **r = *a + *b;
+}
 /**
  * Execute function f for each element of list list.
  */
 void list_foreach (void (*f) (element_t), struct list* list) {
   for (int i = 0; i < list->len; i++)
     f (list->data [i]);
+}
+
+int main (int argc, char** argv) {
+	int a[]   = {1, 2, 3, 4, 5};
+	int* ap[] =  {a, a+1, a+2, a+3, a+4};
+	struct list* l0 = list_create();
+	list_append_array (l0, (element_t*) ap, sizeof(ap)/sizeof(ap[0]));
+	struct list* l1 = list_create();
+	int s = 0;
+	list_scan (add, &s, l1, l0);
+	for (int i = 0; i < l1->len; i++) {
+		printf("%d\n", l1->data[i] );
+	}
+
+	return 0;
 }

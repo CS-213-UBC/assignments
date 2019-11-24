@@ -209,12 +209,12 @@ void list_scan (
   }
 }
 
-void add (element_t* rv, element_t av, element_t bv) {
-  int **r = (int**) rv, *a = av, *b = bv;
-  if (*r == NULL)
-    *r = malloc (sizeof (int*));
-  **r = *a + *b;
-}
+// void add (element_t* rv, element_t av, element_t bv) {
+//   int **r = (int**) rv, *a = av, *b = bv;
+//   if (*r == NULL)
+//     *r = malloc (sizeof (int*));
+//   **r = *a + *b;
+// }
 /**
  * Execute function f for each element of list list.
  */
@@ -222,18 +222,36 @@ void list_foreach (void (*f) (element_t), struct list* list) {
   for (int i = 0; i < list->len; i++)
     f (list->data [i]);
 }
+void max (element_t* rv, element_t av, element_t bv) {
+  int **r = (int**) rv, *a = av, *b = bv;
+  if (*r == NULL)
+    *r = malloc(sizeof(int*));
+  **r = *a > *b? *a: *b;
+}
+void even (element_t* rv, element_t av) {
+  int **r = (int**)rv, *a = av;
+  if (*r == NULL)
+    *r = malloc(sizeof(int*));
+  **r = (*a & 1)? 0: 1;
+}
 
-int main (int argc, char** argv) {
-	int a[]   = (int []) {1, 2, 3, 4, 5};
-	int* ap[] = (int* []) {a, a+1, a+2, a+3, a+4};
-	struct list* l0 = list_create();
-	list_append_array (l0, (element_t*) ap, sizeof(ap)/sizeof(ap[0]));
-	struct list* l1 = list_create();
-	int s = 0;
-	list_scan (add, &s, l1, l0);
-	for (int i = 0; i < l1->len; i++) {
-		printf("%d\n", l1->data[i] );
-	}
 
+int add (int a, int b) {return a+b;}
+int sub (int a, int b) {return a-b;}
+int diva (int a, int b) {return a/b;}
+int mul (int a, int b) {return a*b;}
+
+int (*func[4])(int,int) = {add,sub,diva,mul};
+
+  int main (int argc, char** argv) {
+  int a = 1;
+  int b = 4;
+  int c = 7;
+  int d = func[func[1](b,a)](func[2](c,b),func[0](a,b));
+  printf("%d\n",d);
+
+
+
+	
 	return 0;
 }

@@ -9,6 +9,7 @@ struct StringNode_class {
   void (*printNode) (void*);
   void (*insert)    (void*, void*);
   void (*print)     (void*);
+  void (*delete)    (void*);
 };
 extern struct StringNode_class StringNode_class_table;
 
@@ -33,6 +34,7 @@ struct StringNode {
 void StringNode_ctor(void*, char*);
 int StringNode_compareTo(void*, void*);
 void StringNode_printNode(void*);
+void StringNode_delete(void*);
 
 /**
  * definition of new for class

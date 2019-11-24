@@ -10,6 +10,7 @@ struct Node_class Node_class_table = {
   NULL,  /* abstract printNode* */
   Node_insert,
   Node_print,
+  NULL,
 };
 
 /**
