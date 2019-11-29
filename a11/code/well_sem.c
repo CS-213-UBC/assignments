@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include "uthread.h"
 #include "uthread_sem.h"
+#include "uthread_mutex_cond.h"
+#include <time.h>
 
 #ifdef VERBOSE
 #define VERBOSE_PRINT(S, ...) printf (S, ##__VA_ARGS__);
@@ -14,6 +16,7 @@
 
 #define MAX_OCCUPANCY      3
 #define NUM_ITERATIONS     100
+#define N                  20
 #define NUM_PEOPLE         20
 #define FAIR_WAITING_COUNT 4
 
@@ -27,7 +30,9 @@ static int counter = 0;
 
 static uthread_t threads[NUM_PEOPLE];
 static uthread_mutex_t mx;
-static uthread_cond_t can_enter[2];
+static uthread_sem_t can_enter[2];
+static uthread_sem_t right_end[2];
+static uthread_sem_t mx_sem;
 
 struct Well {
   enum Endianness end; //current occupancy
@@ -56,43 +61,52 @@ struct Well* Well;
 int             entryTicker;                                          // incremented with each entry
 int             waitingHistogram         [WAITING_HISTOGRAM_SIZE];
 int             waitingHistogramOverflow;
-uthread_mutex_t waitingHistogrammutex;
-uthread_mutex_t occupancyHistorymutex;
+uthread_sem_t waitingHistogrammutex;
+uthread_sem_t occupancyHistorymutex;
 int             occupancyHistogram       [2] [MAX_OCCUPANCY + 1];
 
 void recordWaitingTime (int waitingTime) {
-  uthread_mutex_lock (waitingHistogrammutex);
+  uthread_sem_wait (waitingHistogrammutex);
   if (waitingTime < WAITING_HISTOGRAM_SIZE)
     waitingHistogram [waitingTime] ++;
   else
     waitingHistogramOverflow ++;
-  uthread_mutex_unlock (waitingHistogrammutex);
+  uthread_sem_signal (waitingHistogrammutex);
 }
 
 void recordWellConditions(enum Endianness e){
-  uthread_mutex_lock (occupancyHistorymutex);
+  uthread_sem_wait (occupancyHistorymutex);
   int num = Well->occupants[e];
   occupancyHistogram[e][num] ++;
-  uthread_mutex_unlock (occupancyHistorymutex);
+  uthread_sem_signal (occupancyHistorymutex);
 }
 
 void enterWell (enum Endianness g) {
-  uthread_mutex_lock(mx);
+  //uthread_mutex_lock(mx);
+  uthread_sem_wait(mx_sem);
+ 
+
   counter++;
   int start = counter;
+  //printf("tried to enter the well %d, end is %d\n", start, g);
   if (Well->end == NONE){
     Well->end = g;
+    uthread_sem_signal(can_enter[g]);
+    uthread_sem_signal(can_enter[g]);
+    uthread_sem_signal(can_enter[g]);
   }
 
-  while(Well->totalOccupants >= 3 || Well->occupants[g] >= 3 || Well->end != g){ //waiting time
-    Well->queue[g] ++; //increase number in queue
-    uthread_cond_wait(can_enter[g]);
-    //printf("finished waiting, now continue loop %d\n", start);
-    Well->queue[g] --;
-    if(Well->totalOccupants == 0){ //if all have left...
-      Well->end = g;
-    }
-  }
+  //if (Well->totalOccupants >= 3 || Well->occupants[g] >= 3 || Well->end != g){ //waiting time
+  Well->queue[g] ++; //increase number in queue
+  //uthread_cond_wait(can_enter[g]);
+  uthread_sem_signal(mx_sem);
+
+  uthread_sem_wait(can_enter[g]);
+  uthread_sem_wait(mx_sem);
+
+  printf("end %d officially entered the well %d\n", g, start);
+  Well->queue[g] --;
+  //}
   //now entered
   Well->totalOccupants ++;
   Well->occupants[g] ++;
@@ -103,30 +117,64 @@ void enterWell (enum Endianness g) {
   assert(Well->occupants[!g] == 0);
   recordWellConditions(g);
   recordWaitingTime(counter - start);
-  uthread_mutex_unlock(mx);
+
+  printf("finished mx %d\n", start);
+
+  uthread_sem_signal(mx_sem);
 }
 
 void leaveWell() {
-  uthread_mutex_lock(mx);
+  uthread_sem_wait(mx_sem);
+  printf("LEaving well \n");
+  printf("current no in queue for little is %d\n", Well->queue[LITTLE]);
+  printf("current no in queue for big is %d\n", Well->queue[BIG]);
+  //uthread_mutex_lock(mx);
 
   //implement policy here....
   Well->totalOccupants --;
    Well->occupants[Well->end] --;
-  if (Well->totalOccupants == 0) {    
+  if (Well->totalOccupants == 0) {  
+
+    if (Well->queue[!Well->end] > 0){
+      Well->end = !Well->end;
+    }
+    uthread_sem_signal(can_enter[Well->end]);
+    uthread_sem_signal(can_enter[Well->end]);
+    uthread_sem_signal(can_enter[Well->end]);
+    
+  } 
+  //uthread_mutex_unlock(mx);
+  uthread_sem_signal(mx_sem);
+}
+
+void leaveWell_Old() {
+  uthread_sem_wait(mx_sem);
+  //uthread_mutex_lock(mx);
+
+  //implement policy here....
+  Well->totalOccupants --;
+   Well->occupants[Well->end] --;
+  if (Well->totalOccupants == 0) {  
+      
     if (Well->queue[!Well->end] == 0){ //if other end is already 0
-      uthread_cond_broadcast(can_enter[Well->end]);
+      //uthread_cond_broadcast(can_enter[Well->end]);
+      uthread_sem_signal(can_enter[Well->end]);
     } else {
-      uthread_cond_broadcast(can_enter[!Well->end]);
+      //uthread_cond_broadcast(can_enter[!Well->end]);
+      uthread_sem_signal(can_enter[!Well->end]);
     }
   } else if (rand() % 5 == 0){
     if (Well->queue[Well->end] == 0){ //if end is already 0
-      uthread_cond_broadcast(can_enter[!Well->end]);
+      //uthread_cond_broadcast(can_enter[!Well->end]);
+      uthread_sem_signal(can_enter[!Well->end]);
     } else {
-      uthread_cond_broadcast(can_enter[Well->end]);
+      //uthread_cond_broadcast(can_enter[Well->end]);
+      uthread_sem_signal(can_enter[Well->end]);
     }
     
   }
-  uthread_mutex_unlock(mx);
+  //uthread_mutex_unlock(mx);
+  uthread_sem_signal(mx_sem);
 }
 
 
@@ -148,15 +196,21 @@ void* createPerson(void* dunno){
 
 int main (int argc, char** argv) {
   srand(time(NULL));
-  uthread_init (4);
+  uthread_init (1);
   Well = createWell();
   uthread_t pt [NUM_PEOPLE];
-  waitingHistogrammutex = uthread_sem_create ();
-  occupancyHistorymutex = uthread_sem_create ();
-  mx = uthread_sem_create ();
+  waitingHistogrammutex = uthread_sem_create(1);
+  occupancyHistorymutex = uthread_sem_create(1);
+  mx_sem = uthread_sem_create(1);
 
-  can_enter[LITTLE] = uthread_cond_create(mx);
-  can_enter[BIG] = uthread_cond_create(mx);
+  //general = uthread_sem_create (1);
+  //mx = uthread_mutex_create (0);
+
+  can_enter[LITTLE] = uthread_sem_create(0);
+  can_enter[BIG] = uthread_sem_create(0);
+
+  //right_end[LITTLE] = uthread_sem_create(0);
+  //right_end[BIG] = uthread_sem_create(0);
 
   for (int i = 0; i < NUM_PEOPLE; i++){ //creating threads
     pt[i] = uthread_create(createPerson, (void*) 0);
