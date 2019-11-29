@@ -1,0 +1,10 @@
+Using semaphores instead of mutexes solves the unfairness problem. 
+For example for the problem with 20 people and 100 iterations, using mutexes resulted 
+in one person waiting for 392 people to enter, while using semaphores for the same problem,
+the maximum number people had to wait for is 19.
+
+Despite using a queue with fifo order, using mutexes means that there is a chance a thread that
+has not been waiting at all might be able to make its way into the critical section before the other
+threads. 
+Using semaphores prevents these scenarios from happening because it has an atomic counter. There is no 
+delay between signalling and waiting and therefore it is always "fair", following fifo.

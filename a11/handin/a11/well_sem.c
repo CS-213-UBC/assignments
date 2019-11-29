@@ -82,13 +82,11 @@ void recordWellConditions(enum Endianness e){
 }
 
 void enterWell (enum Endianness g) {
-  //uthread_mutex_lock(mx);
   uthread_sem_wait(mx_sem);
  
 
   counter++;
   int start = counter;
-  //printf("tried to enter the well %d, end is %d\n", start, g);
   if (Well->end == NONE){
     Well->end = g;
     uthread_sem_signal(can_enter[g]);
@@ -96,17 +94,13 @@ void enterWell (enum Endianness g) {
     uthread_sem_signal(can_enter[g]);
   }
 
-  //if (Well->totalOccupants >= 3 || Well->occupants[g] >= 3 || Well->end != g){ //waiting time
   Well->queue[g] ++; //increase number in queue
-  //uthread_cond_wait(can_enter[g]);
   uthread_sem_signal(mx_sem);
 
   uthread_sem_wait(can_enter[g]);
   uthread_sem_wait(mx_sem);
 
-  printf("end %d officially entered the well %d\n", g, start);
   Well->queue[g] --;
-  //}
   //now entered
   Well->totalOccupants ++;
   Well->occupants[g] ++;
@@ -118,17 +112,12 @@ void enterWell (enum Endianness g) {
   recordWellConditions(g);
   recordWaitingTime(counter - start);
 
-  printf("finished mx %d\n", start);
 
   uthread_sem_signal(mx_sem);
 }
 
 void leaveWell() {
   uthread_sem_wait(mx_sem);
-  printf("LEaving well \n");
-  printf("current no in queue for little is %d\n", Well->queue[LITTLE]);
-  printf("current no in queue for big is %d\n", Well->queue[BIG]);
-  //uthread_mutex_lock(mx);
 
   //implement policy here....
   Well->totalOccupants --;
@@ -141,50 +130,10 @@ void leaveWell() {
     uthread_sem_signal(can_enter[Well->end]);
     uthread_sem_signal(can_enter[Well->end]);
     uthread_sem_signal(can_enter[Well->end]);
-    
-  } else if (rand() % 5 == 0){ 
-    if (Well->queue[Well->end] == 0){ //if end is already 0
-      //Well->end = !Well->end;
-      printf("HI");
-    }
-    //uthread_sem_signal(can_enter[Well->end]);
-    //uthread_sem_wait(can_enter[!Well->end]);
-
   }
 
   uthread_sem_signal(mx_sem);
 }
-
-void leaveWell_Old() {
-  uthread_sem_wait(mx_sem);
-  //uthread_mutex_lock(mx);
-
-  //implement policy here....
-  Well->totalOccupants --;
-   Well->occupants[Well->end] --;
-  if (Well->totalOccupants == 0) {  
-      
-    if (Well->queue[!Well->end] == 0){ //if other end is already 0
-      //uthread_cond_broadcast(can_enter[Well->end]);
-      uthread_sem_signal(can_enter[Well->end]);
-    } else {
-      //uthread_cond_broadcast(can_enter[!Well->end]);
-      uthread_sem_signal(can_enter[!Well->end]);
-    }
-  } else if (rand() % 5 == 0){
-    if (Well->queue[Well->end] == 0){ //if end is already 0
-      //uthread_cond_broadcast(can_enter[!Well->end]);
-      uthread_sem_signal(can_enter[!Well->end]);
-    } else {
-      //uthread_cond_broadcast(can_enter[Well->end]);
-      uthread_sem_signal(can_enter[Well->end]);
-    }
-    
-  }
-  //uthread_mutex_unlock(mx);
-  uthread_sem_signal(mx_sem);
-}
-
 
 
 void* createPerson(void* dunno){
@@ -211,20 +160,13 @@ int main (int argc, char** argv) {
   occupancyHistorymutex = uthread_sem_create(1);
   mx_sem = uthread_sem_create(1);
 
-  //general = uthread_sem_create (1);
-  //mx = uthread_mutex_create (0);
-
   can_enter[LITTLE] = uthread_sem_create(0);
   can_enter[BIG] = uthread_sem_create(0);
-
-  //right_end[LITTLE] = uthread_sem_create(0);
-  //right_end[BIG] = uthread_sem_create(0);
 
   for (int i = 0; i < NUM_PEOPLE; i++){ //creating threads
     pt[i] = uthread_create(createPerson, (void*) 0);
   }
 
-  // TODO
   enum Endianness g = Well->end;
 
   for (int i = 0; i < (sizeof pt) / (sizeof pt[0]); i++) {
